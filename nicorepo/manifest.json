@@ -1,0 +1,13 @@
+{
+   "manifest_version": 2,
+   "name": "ニコレポチェッカー",
+   "description": "ニコレポの新着を通知します。",
+   "icons": {
+      "128": "icon128.png",
+      "48": "icon48.png"
+   },
+   "version": "0.1.12",
+   "permissions": [ "http://flapi.nicovideo.jp/", "http://www.nicovideo.jp/", "http://com.nicovideo.jp/", "notifications" ],
+   "background": { "page": "background.html" },
+   "options_page": "options.html"
+}

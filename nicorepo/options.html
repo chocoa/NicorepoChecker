@@ -1,0 +1,133 @@
+﻿<!doctype html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>ニコレポチェッカー 設定</title>
+	<script src="nicorepo.js"></script>
+	<script src="options.js"></script>
+	<style>
+		.iconlist img {
+			width:50px;
+			height:50px;
+		}
+		#userlist {
+			float:left;
+		}
+		#userchecklist {
+			float:left;
+		}
+		.usercheck {
+			padding:5px;
+			background-color:#EEE;
+		}
+		.usercheckbox {
+			margin:5px;
+			background-color:#DDD;
+		}
+		.rot_container {
+			width:26px;
+			height:200px;
+			margin:2px 0px;
+			overflow:hidden;
+		}
+		.rot90{
+			font-size:15px;
+			line-height:11px;
+			-webkit-transform-origin:0 0;
+			-webkit-transform:translate(0px,200px) rotate(-90deg); 
+			width:200px;
+			text-align:left;
+		}
+		.rot90 span{
+			font-size : 8px;
+			font-weight:normal;
+		}
+		.userlist_check {
+			width:28px;
+			height:50px;
+		}
+		.userlist_check label {
+			margin-top: -36px;
+			display: block;
+			position: absolute;
+			padding: 26px 14px;
+			text-indent: 10px;
+			color: #EEE;
+		}
+		.userlist_check label:hover {
+			border: 1px solid #666;
+		}
+		.commlist_check {
+			width:28px;
+			height:50px;
+		}
+		.commlist_check label {
+			margin-top: -36px;
+			display: block;
+			position: absolute;
+			padding: 26px 14px;
+			text-indent: 10px;
+			color: #EEE;
+		}
+		.commlist_check label:hover {
+			border: 1px solid #666;
+		}
+		table { border:1px solid #FFABF0; }
+		th { border:1px solid #DDD }
+		td { background-color:#EEE; }
+		
+		a.tooltip {position:relative;}
+		a.tooltip span {
+			white-space:nowrap;
+			position:absolute;
+			visibility:hidden;
+			padding:2px 3px;
+			margin-left:8px;
+			background:#eee;
+			border:1px solid #aaa;
+			text-align:left;
+			color:#555;
+		}
+	</style>
+</head>
+<body>
+	<h1>ニコレポチェッカー 設定</h1>
+	<p><label>チェック間隔(秒) :<input id="checkinterval" type="number" min="60"></label></p>
+	<p><label>ポップアップ表示時間(秒) :<input id="popuptime" type="number" min="1"></label></p>
+	<p>ポップアップタイトル背景色 不明<input id="pb_none_color" type="color" value="#EEEEEE"></p>
+	<p>ポップアップタイトル背景色 ユーザー<input id="pb_user_color" type="color" value="#FFDDEE"></p>
+	<p>ポップアップタイトル背景色 コミュニティ<input id="pb_comm_color" type="color" value="#DDFFEE"></p>
+	
+	<table class="voice_setting">
+		<tr><td colspan="2"><label><input id="voice_use" type="checkbox" checked/>棒読みちゃんを使用する</label></td></tr>
+		<tr><td>速度：</td><td><input id="voice_speed" type="range" min="50" max="200"/><label><input id="voice_speed_def" type="checkbox" checked/>本体設定</label></td></tr>
+		<tr><td>音程：</td><td><input id="voice_pitch" type="range" min="50" max="200"/><label><input id="voice_pitch_def" type="checkbox" checked/>本体設定</label></td></tr>
+		<tr><td>音量：</td><td><input id="voice_volume" type="range" min="0" max="100"/><label><input id="voice_volume_def" type="checkbox" checked/>本体設定</label></td></tr>	
+		<tr><td>種類：</td>
+			<td>
+				<select id="voice_type">
+					<option value="1">女性1</option>
+					<option value="2">女性2</option>
+					<option value="3">男性1</option>
+					<option value="4">男性2</option>
+					<option value="5">中性</option>
+					<option value="6">ロボット</option>
+					<option value="7">機械1</option>
+					<option value="8">機械2</option>
+				</select>
+				<label><input id="voice_type_def" type="checkbox" checked/>本体設定</label>
+			</td>
+		</tr>
+		<tr><td><input id="talktest" type="button" value="テスト"></td><td><input id="talk" type="text" value="テスト"></td></tr>	
+	</table>
+	
+	<p><input id="checknow" type="button" value="今すぐチェック"></p>
+
+
+	<div id="userlist" class="iconlist">
+	</div>
+	<div id="commlist" class="iconlist">
+	</div>
+
+</body>
+</html>
