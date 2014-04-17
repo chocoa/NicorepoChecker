@@ -33,6 +33,7 @@ function getDOMfromText(text) {
 function CNicoRepo() {
 	this.request = new XMLHttpRequest();
 	this.settings = localStorage;
+	this.noticeID = 0;
 	// デフォルト
 	if(!this.settings.lastcheck)		this.settings.lastcheck = 0 + new Date();			// 最終チェック時間
 	if(!this.settings.checkinterval)	this.settings.checkinterval = 60 * 1000;			// チェック間隔(60秒)
@@ -165,7 +166,7 @@ CNicoRepo.prototype.showPopup = function(data) {
 	var author = data["o"];
 	var time = data["t"];
 	var mode = data["y"];
-	// IDがディレクトリ分割されている物の為
+	// IDがディレクトリ分割されている為、上位桁を取得
 	authorid_h = this.getIDh(authorid);
 	// ポップアップ内容をモードごとに構築
 	var lurl, msg, icon, pbc;
@@ -173,9 +174,8 @@ CNicoRepo.prototype.showPopup = function(data) {
 	switch(mode) {
 		case '1': // 個人
 			lurl = "http://www.nicovideo.jp/user/"+authorid;
-			//msg = "<a href=\"http://www.nicovideo.jp/user/"+authorid+"\" target='_blank'>" + message + "</a>";
 			msg = message;
-			icon = "http://usericon.nimg.jp/usericon/s/"+authorid_h+"/"+authorid+".jpg";
+			icon = "http://usericon.nimg.jp/usericon/"+authorid_h+"/"+authorid+".jpg";
 			pbc = this.settings.pb_user_color;
 			// パーミッションのチェック
 			console.log("type:"+type+" user:"+authorid);
@@ -186,7 +186,6 @@ CNicoRepo.prototype.showPopup = function(data) {
 			break;
 		case '3': // コミュ
 			lurl = "http://com.nicovideo.jp/community/co"+authorid;
-			//msg = "<a href=\"http://com.nicovideo.jp/community/co"+authorid+"\" target='_blank'>" + message + "</a>";
 			msg = message;
 			icon = "http://icon.nimg.jp/community/"+authorid_h+"/co"+authorid+".jpg";
 			pbc = this.settings.pb_comm_color;
@@ -202,26 +201,50 @@ CNicoRepo.prototype.showPopup = function(data) {
 			pbc = this.settings.pb_none_color;
 			break;
 	}
+	
 	// タイプ
 	type = this.getTitle(type);
 	// 時刻の整形
 	var stime = new Date(time/10);
 	stime = stime.getDate() + "日" + stime.getHours() + ":" + stime.getMinutes();
 	// ポップアップのセットアップ
-	if(!webkitNotifications) return;
-	var data = { nico: icon, nmsg: msg, name: author, title: type, time:stime, pbc: pbc };
-	//var notice = webkitNotifications.createHTMLNotification('popup.html#'+JSON.stringify(data));
-	var notice = webkitNotifications.createNotification(icon, type + stime, "【"+author+"】" + msg );
-	//var notice = webkitNotifications.createNotification(icon, type + stime, 'text', msg);
-	notice.onclick = function(x) {
-		this.cancel();
-		chrome.tabs.create({ url: lurl, selected: true });
-	}
-	notice.show();
-	setTimeout( function(){ notice.cancel(); }, parseInt(this.settings.popuptime) );
+	var options = {
+		type: 'basic',
+		title : type + stime,
+		message : "【"+author+"】" + msg,
+		priority : 2
+	};
+	var me = this;
+	// アイコン読み込み
+	var request = new XMLHttpRequest();
+	request.open("GET", icon);
+	request.responseType = "blob";
+	request.onload = function(){
+		var blob = this.response;
+		options.iconUrl = window.URL.createObjectURL(blob);
+		console.log(options.iconUrl);
+		// ポップアップ表示
+		chrome.notifications.create("nrc" + me.noticeID++ + "!" + lurl, options, 
+			function noticeCreated(noticeID) {
+				setTimeout(function() {
+					console.log("timeout clear :" + noticeID);
+					chrome.notifications.clear(noticeID, null);
+				}, parseInt(me.settings.popuptime));
+			}
+		);
+	};
+	request.send(null);
+	
 	// 棒読みちゃん
 	if(this.settings.voice_use==1) bouyomi_talk( author + "。" + message );
 };
+// ポップアップがクリックされた時のイベント
+chrome.notifications.onClicked.addListener( function(noticeID) {
+	console.log("clicked :" + noticeID);
+	var url = noticeID.split("!");
+	console.log("url :" + url[1]);
+	chrome.tabs.create({ url: url[1], selected: true });
+});
 
 // ポップアップの表示
 CNicoRepo.prototype.getTitle = function(type) {
