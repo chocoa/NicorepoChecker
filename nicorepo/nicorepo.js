@@ -12,6 +12,7 @@ Array.prototype.unique = function() {
 	for (i in o) n.push(o[i]);
 	return n;
 }
+// キーが存在するかチェック
 function KeyExists ( obj, key ) {
 	if( !obj || (obj.constructor !== Array && obj.constructor !== Object) ) {
 		return false;
@@ -26,6 +27,11 @@ function getDOMfromText(text) {
 	}
 	return div;
 }
+// コールスタックをコンソールに表示
+function outCallStack() {
+	var err = new Error();
+	err.stack;
+}
 
 ///////////////////////////
 // ニコレポクラス 
@@ -33,20 +39,18 @@ function getDOMfromText(text) {
 function CNicoRepo() {
 	this.request = new XMLHttpRequest();
 	this.settings = localStorage;
+	// マイグレ用
+	
 	// デフォルト
 	if(!this.settings.lastcheck)		this.settings.lastcheck = 0 + new Date();			// 最終チェック時間
 	if(!this.settings.checkinterval)	this.settings.checkinterval = 60 * 1000;			// チェック間隔(60秒)
 	if(!this.settings.popuptime)		this.settings.popuptime = 10 * 1000;				// ポップアップ表示時間(10秒)
-	if(!this.settings.pb_none_color)	this.settings.pb_none_color = "#EEEEEE";			// ポップアップ背景色 不明
-	if(!this.settings.pb_user_color)	this.settings.pb_user_color = "#FFDDEE";			// ポップアップ背景色 ユーザー
-	if(!this.settings.pb_comm_color)	this.settings.pb_comm_color = "#DDFFEE";			// ポップアップ背景色 コミュニティ
 	if(!this.settings.voice_use)		this.settings.voice_use = 1;						// 棒読みちゃん使用
 	if(!this.settings.voice_speed)		this.settings.voice_speed = -1;						// 棒読みちゃん速度
 	if(!this.settings.voice_pitch)		this.settings.voice_pitch = -1;						// 棒読みちゃん音程
 	if(!this.settings.voice_volume)		this.settings.voice_volume = -1;					// 棒読みちゃん音量
 	if(!this.settings.voice_type)		this.settings.voice_type = 0;						// 棒読みちゃんタイプ
-	if(!this.settings.permission)		this.settings.permission = '{"new":{}}';			// 表示設定
-	this.permission = JSON.parse(this.settings.permission);
+	if(!this.settings.noticefilter)		this.settings.noticefilter = '{"new":{}}';			// 通知フィルター設定
 	this.types = [
 		"user_video_upload", "動画投稿", 1,
 		"user_video_ranking", "動画ランクイン", 1,
@@ -81,37 +85,45 @@ function CNicoRepo() {
 CNicoRepo.prototype.default_icon = "icon128.png";
 CNicoRepo.prototype.timeline_url = "http://flapi.nicovideo.jp/api/gettimeline";
 
-// パーミッションの取得
-CNicoRepo.prototype.getPermission = function(type,id) {
-	if(!KeyExists(this.permission,id)) this.permission[id] = JSON.parse('{}');
-	if(!KeyExists(this.permission[id],type)) {
-		if(id=="new") {
-			this.setPermission(type, id, 1); // default on
-		} else if(id=="all") {
-			this.setPermission(type, id, 0); // all default off
+// 通知設定の取得
+CNicoRepo.prototype.getNotifiable = function(type,id) {
+	var filter = JSON.parse(this.settings.noticefilter);
+	if(!KeyExists(filter, id)) filter[id] = JSON.parse('{}');
+	if(!KeyExists(filter[id], type)) {
+		if(id == "new") {
+			this.setNotifiable(type, id, 1); // default on
+		} else if(id == "all") {
+			this.setNotifiable(type, id, 0); // all default off
 		} else {
-			this.setPermission(type, id, this.getPermission(type,"new"));
+			this.setNotifiable(type, id, this.getNotifiable(type,"new"));
 		}
 	}
-	return this.permission[id][type];
+	return filter[id][type];
 };
 
-// パーミッションの設定
-CNicoRepo.prototype.setPermission = function(type,id,value) {
-	this.permission[id][type] = value;
-	this.settings.permission = JSON.stringify( this.permission );
+// 通知設定の設定
+CNicoRepo.prototype.setNotifiable = function(type, id, value) {
+	var filter = JSON.parse(this.settings.noticefilter);
+	if(!KeyExists(filter, id)) filter[id] = JSON.parse('{}');
+	filter[id][type] = value;
+	this.settings.noticefilter = JSON.stringify(filter);
 };
+
+// 名前の取得
 CNicoRepo.prototype.getName = function(id) {
-	
-	if(!KeyExists(this.permission,id)) this.permission[id] = JSON.parse('{}');
-	if(!KeyExists(this.permission[id],"name") || this.permission[id]["name"] == "undefined") {
+	var filter = JSON.parse(this.settings.noticefilter);
+	if(!KeyExists(filter, id)) filter[id] = JSON.parse('{}');
+	if(!KeyExists(filter[id], "name") || filter[id]["name"] == "undefined") {
 		this.getCUName(id);
 	}
-	return this.permission[id]["name"];
+	return filter[id]["name"];
 }
+
+// 名前の設定
 CNicoRepo.prototype.setName = function(id, value) {
-	this.permission[id]["name"] = value;
-	this.settings.permission = JSON.stringify( this.permission );
+	var filter = JSON.parse(this.settings.noticefilter);
+	filter[id]["name"] = value;
+	this.settings.noticefilter = JSON.stringify(filter);
 }
 
 // タイムラインの取得
@@ -123,7 +135,6 @@ CNicoRepo.prototype.getTimeline = function(handler) {
 			if(handler) handler(ret);
 		}
 	};
-	//console.log("getTimeline:GET"+ this.timeline_url + "?at=" + this.settings.lastcheck);
 	req.open("GET", this.timeline_url + "?at=" + this.settings.lastcheck, true);
 	req.send();
 };
@@ -134,18 +145,17 @@ CNicoRepo.prototype.checkTimeLine = function(_this) {
 	var dd = new Date();
 	var st = me.settings.lastcheck;
 	dd.setTime(parseInt(st));
-	me.getTimeline( function(ret){
-		if(ret["timeline"] && ret["timeline"].length > 0){
+	me.getTimeline( function(ret) {
+		if(ret["timeline"] && ret["timeline"].length > 0) {
 			ret["timeline"] = ret["timeline"].reverse();
 			for(i=0;i<ret["timeline"].length;i++) {
 				me.showPopup(ret["timeline"][i]);
 			}
-			//this.settings.lastcheck = ret["access_time"];
 			me.settings.lastcheck = ret["timeline"][--i]["t"]+1;
 		}
 	});
 	if(this.checktimer) clearTimeout(me.checktimer);
-	this.checktimer = setTimeout(me.checkTimeLine, parseInt(me.settings.checkinterval),me);
+	this.checktimer = setTimeout(me.checkTimeLine, parseInt(me.settings.checkinterval), me);
 };
 
 // ID上位の取得
@@ -165,33 +175,29 @@ CNicoRepo.prototype.showPopup = function(data) {
 	var author = data["o"];
 	var time = data["t"];
 	var mode = data["y"];
-	// IDがディレクトリ分割されている物の為
+	// IDがディレクトリ分割されている為、上位桁を取得
 	authorid_h = this.getIDh(authorid);
 	// ポップアップ内容をモードごとに構築
-	var lurl, msg, icon, pbc;
+	var lurl, msg, icon;
 	console.log("mode:"+mode+"type:"+type+" user:"+authorid);
 	switch(mode) {
 		case '1': // 個人
 			lurl = "http://www.nicovideo.jp/user/"+authorid;
-			//msg = "<a href=\"http://www.nicovideo.jp/user/"+authorid+"\" target='_blank'>" + message + "</a>";
 			msg = message;
 			icon = "http://usericon.nimg.jp/usericon/s/"+authorid_h+"/"+authorid+".jpg";
-			pbc = this.settings.pb_user_color;
 			// パーミッションのチェック
 			console.log("type:"+type+" user:"+authorid);
-			if(this.getPermission(type,authorid)==0) {
+			if(this.getNotifiable(type,authorid)==0) {
 				console.log("popup cancelled");
 				return;
 			}
 			break;
 		case '3': // コミュ
 			lurl = "http://com.nicovideo.jp/community/co"+authorid;
-			//msg = "<a href=\"http://com.nicovideo.jp/community/co"+authorid+"\" target='_blank'>" + message + "</a>";
 			msg = message;
 			icon = "http://icon.nimg.jp/community/"+authorid_h+"/co"+authorid+".jpg";
-			pbc = this.settings.pb_comm_color;
 			console.log("type:"+type+" comm:co"+authorid);
-			if(this.getPermission(type,"co"+authorid)==0) {
+			if(this.getNotifiable(type,"co"+authorid)==0) {
 				console.log("popup cancelled");
 				return;
 			}
@@ -199,7 +205,6 @@ CNicoRepo.prototype.showPopup = function(data) {
 		default:
 			msg = mode + message;
 			icon = this.default_icon;
-			pbc = this.settings.pb_none_color;
 			break;
 	}
 	// タイプ
@@ -209,10 +214,8 @@ CNicoRepo.prototype.showPopup = function(data) {
 	stime = stime.getDate() + "日" + stime.getHours() + ":" + stime.getMinutes();
 	// ポップアップのセットアップ
 	if(!webkitNotifications) return;
-	var data = { nico: icon, nmsg: msg, name: author, title: type, time:stime, pbc: pbc };
-	//var notice = webkitNotifications.createHTMLNotification('popup.html#'+JSON.stringify(data));
+	var data = { nico: icon, nmsg: msg, name: author, title: type, time:stime };
 	var notice = webkitNotifications.createNotification(icon, type + stime, "【"+author+"】" + msg );
-	//var notice = webkitNotifications.createNotification(icon, type + stime, 'text', msg);
 	notice.onclick = function(x) {
 		this.cancel();
 		chrome.tabs.create({ url: lurl, selected: true });

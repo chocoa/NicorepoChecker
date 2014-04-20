@@ -17,24 +17,11 @@ document.addEventListener("DOMContentLoaded", function(){
 	}, false);
 	popuptime.value = parseInt(NR.settings.popuptime) / 1000;
 
-	// ポップアップタイトル背景色 不明
-	var pb_none_color = document.getElementById('pb_none_color');
-	pb_none_color.addEventListener('change', function(){
-		NR.settings.pb_none_color = pb_none_color.value;
+	// 今すぐチェック
+	var checknow = document.getElementById('checknow');
+	checknow.addEventListener('click', function(){
+		NR.checkTimeLine();
 	}, false);
-	pb_none_color.value = NR.settings.pb_none_color;
-	// ポップアップタイトル背景色 ユーザー
-	var pb_user_color = document.getElementById('pb_user_color');
-	pb_user_color.addEventListener('change', function(){
-		NR.settings.pb_user_color = pb_user_color.value;
-	}, false);
-	pb_user_color.value = NR.settings.pb_user_color;
-	// ポップアップタイトル背景色 コミュニティ
-	var pb_comm_color = document.getElementById('pb_comm_color');
-	pb_comm_color.addEventListener('change', function(){
-		NR.settings.pb_comm_color = pb_comm_color.value;
-	}, false);
-	pb_comm_color.value = NR.settings.pb_comm_color;
 
 	// 棒読みちゃん使用
 	var voice_use = document.getElementById('voice_use');
@@ -98,12 +85,6 @@ document.addEventListener("DOMContentLoaded", function(){
 		bouyomi_talk(talk);
 	}, false);
 
-	// 今すぐチェック
-	var checknow = document.getElementById('checknow');
-	checknow.addEventListener('click', function(){
-		NR.checkTimeLine();
-	}, false);
-
 	// 文字列のバイト数を取得
 	function getBytes(text)
 	{
@@ -157,14 +138,14 @@ document.addEventListener("DOMContentLoaded", function(){
 					ck.name = 'all';
 					ck.class = NR.types[i];
 					ck.id = NR.types[i] + "_all";
-					ck.checked = NR.getPermission(NR.types[i],"all")==1;
+					ck.checked = NR.getNotifiable(NR.types[i],"user_all")==1;
 					ck.addEventListener('change', function(){
 						var k = this.checked?1:0;
 						//console.log(this.class +"-"+this.name);
-						NR.setPermission(this.class,"all",k);
+						NR.setNotifiable(this.class,"all",k);
 						// ユーザー一挙設定
 						for(j=0;j<userids.length;j++) {
-							NR.setPermission(this.class, userids[j],k);
+							NR.setNotifiable(this.class, userids[j],k);
 							var cbbid = document.getElementById(this.class + "_" + userids[j]);
 							cbbid.checked = k;
 						}
@@ -190,11 +171,11 @@ document.addEventListener("DOMContentLoaded", function(){
 					ck.name = 'new';
 					ck.class = NR.types[i];
 					ck.id = NR.types[i] + "_new";
-					ck.checked = NR.getPermission(NR.types[i],"new")==1;
+					ck.checked = NR.getNotifiable(NR.types[i],"user_new")==1;
 					ck.addEventListener('change', function(){
 						var k = this.checked;
 						//console.log(this.class +"-"+this.name);
-						NR.setPermission(this.class,"new",(k?1:0));
+						NR.setNotifiable(this.class,"new",(k?1:0));
 					}, false);
 					td.appendChild(ck);
 					var lb = document.createElement('label');
@@ -243,11 +224,11 @@ document.addEventListener("DOMContentLoaded", function(){
 						ck.name = userids[j];
 						ck.class = NR.types[i];
 						ck.id = NR.types[i] + "_" + userids[j];
-						ck.checked = NR.getPermission(NR.types[i],userids[j])==1;
+						ck.checked = NR.getNotifiable(NR.types[i],"user_"+userids[j])==1;
 						ck.addEventListener('change', function(){
 							var k = this.checked;
 							//console.log(this.class +"-"+this.name);
-							NR.setPermission(this.class,this.name,(k?1:0));
+							NR.setNotifiable(this.class,this.name,(k?1:0));
 						}, false);
 						td.appendChild(ck);
 						var lb = document.createElement('label');
@@ -296,15 +277,15 @@ document.addEventListener("DOMContentLoaded", function(){
 					ck.name = 'all';
 					ck.class = NR.types[i];
 					ck.id = NR.types[i] + "_all";
-					ck.checked = NR.getPermission(NR.types[i],"all")==1;
+					ck.checked = NR.getNotifiable(NR.types[i],"comm_all")==1;
 					ck.addEventListener('change', function(){
 						var k = this.checked?1:0;
 						//console.log(this.class +"-"+this.name);
-						NR.setPermission(this.class,"all",k);
+						NR.setNotifiable(this.class,"all",k);
 						
 						// コミュニティー一挙設定
 						for(j=0;j<commids.length;j++) {
-							NR.setPermission(this.class, "co"+commids[j],k);
+							NR.setNotifiable(this.class, "co"+commids[j],k);
 							var cbbid = document.getElementById(this.class + "_co" + commids[j]);
 							cbbid.checked = k;
 						}
@@ -331,11 +312,11 @@ document.addEventListener("DOMContentLoaded", function(){
 					ck.name = 'new';
 					ck.class = NR.types[i];
 					ck.id = NR.types[i] + "_new";
-					ck.checked = NR.getPermission(NR.types[i],"new")==1;
+					ck.checked = NR.getNotifiable(NR.types[i],"comm_new")==1;
 					ck.addEventListener('change', function(){
 						var k = this.checked;
 						//console.log(this.class +"-"+this.name);
-						NR.setPermission(this.class,"new",(k?1:0));
+						NR.setNotifiable(this.class,"new",(k?1:0));
 					}, false);
 					td.appendChild(ck);
 					var lb = document.createElement('label');
@@ -383,11 +364,11 @@ document.addEventListener("DOMContentLoaded", function(){
 						ck.name = "co"+commids[j];
 						ck.class = NR.types[i];
 						ck.id = NR.types[i] + "_co" + commids[j];
-						ck.checked = NR.getPermission(NR.types[i],"co"+commids[j])==1;
+						ck.checked = NR.getNotifiable(NR.types[i],"comm_"+commids[j])==1;
 						ck.addEventListener('change', function(){
 							var k = this.checked;
 							//console.log(this.class +"-"+this.name);
-							NR.setPermission(this.class,this.name,(k?1:0));
+							NR.setNotifiable(this.class,this.name,(k?1:0));
 						}, false);
 						td.appendChild(ck);
 						var lb = document.createElement('label');
