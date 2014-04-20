@@ -138,14 +138,14 @@ document.addEventListener("DOMContentLoaded", function(){
 					ck.name = 'all';
 					ck.class = NR.types[i];
 					ck.id = NR.types[i] + "_all";
-					ck.checked = NR.getNotifiable(NR.types[i],"user_all")==1;
+					ck.checked = NR.getNotifiable(NR.types[i],"user","all")==1;
 					ck.addEventListener('change', function(){
 						var k = this.checked?1:0;
 						//console.log(this.class +"-"+this.name);
-						NR.setNotifiable(this.class,"all",k);
+						NR.setNotifiable(this.class,"user","all",k);
 						// ユーザー一挙設定
 						for(j=0;j<userids.length;j++) {
-							NR.setNotifiable(this.class, userids[j],k);
+							NR.setNotifiable(this.class,"user",userids[j],k);
 							var cbbid = document.getElementById(this.class + "_" + userids[j]);
 							cbbid.checked = k;
 						}
@@ -171,11 +171,11 @@ document.addEventListener("DOMContentLoaded", function(){
 					ck.name = 'new';
 					ck.class = NR.types[i];
 					ck.id = NR.types[i] + "_new";
-					ck.checked = NR.getNotifiable(NR.types[i],"user_new")==1;
+					ck.checked = NR.getNotifiable(NR.types[i],"user","new")==1;
 					ck.addEventListener('change', function(){
 						var k = this.checked;
 						//console.log(this.class +"-"+this.name);
-						NR.setNotifiable(this.class,"new",(k?1:0));
+						NR.setNotifiable(this.class,"user","new",(k?1:0));
 					}, false);
 					td.appendChild(ck);
 					var lb = document.createElement('label');
@@ -196,8 +196,7 @@ document.addEventListener("DOMContentLoaded", function(){
 					im.src = "http://usericon.nimg.jp/usericon/"+idh+"/"+id+".jpg";
 					im.alt = id;
 					im.addEventListener('mouseover', function(){
-						var name  = NR.getName(this.alt);
-						if(!name) name = "取得中...";
+						var name  = NR.getName("user",this.alt);
 						var tp = document.getElementById("chip_" + this.alt);
 						tp.innerHTML = this.alt + "<br>" + name;
 						tp.style.visibility = "visible";
@@ -224,11 +223,11 @@ document.addEventListener("DOMContentLoaded", function(){
 						ck.name = userids[j];
 						ck.class = NR.types[i];
 						ck.id = NR.types[i] + "_" + userids[j];
-						ck.checked = NR.getNotifiable(NR.types[i],"user_"+userids[j])==1;
+						ck.checked = NR.getNotifiable(NR.types[i],"user",userids[j])==1;
 						ck.addEventListener('change', function(){
 							var k = this.checked;
 							//console.log(this.class +"-"+this.name);
-							NR.setNotifiable(this.class,this.name,(k?1:0));
+							NR.setNotifiable(this.class,"user",this.name,(k?1:0));
 						}, false);
 						td.appendChild(ck);
 						var lb = document.createElement('label');
@@ -277,15 +276,15 @@ document.addEventListener("DOMContentLoaded", function(){
 					ck.name = 'all';
 					ck.class = NR.types[i];
 					ck.id = NR.types[i] + "_all";
-					ck.checked = NR.getNotifiable(NR.types[i],"comm_all")==1;
+					ck.checked = NR.getNotifiable(NR.types[i],"comm","all")==1;
 					ck.addEventListener('change', function(){
 						var k = this.checked?1:0;
 						//console.log(this.class +"-"+this.name);
-						NR.setNotifiable(this.class,"all",k);
+						NR.setNotifiable(this.class,"comm","all",k);
 						
 						// コミュニティー一挙設定
 						for(j=0;j<commids.length;j++) {
-							NR.setNotifiable(this.class, "co"+commids[j],k);
+							NR.setNotifiable(this.class,"comm",commids[j],k);
 							var cbbid = document.getElementById(this.class + "_co" + commids[j]);
 							cbbid.checked = k;
 						}
@@ -312,11 +311,11 @@ document.addEventListener("DOMContentLoaded", function(){
 					ck.name = 'new';
 					ck.class = NR.types[i];
 					ck.id = NR.types[i] + "_new";
-					ck.checked = NR.getNotifiable(NR.types[i],"comm_new")==1;
+					ck.checked = NR.getNotifiable(NR.types[i],"comm","new")==1;
 					ck.addEventListener('change', function(){
 						var k = this.checked;
 						//console.log(this.class +"-"+this.name);
-						NR.setNotifiable(this.class,"new",(k?1:0));
+						NR.setNotifiable(this.class,"comm","new",(k?1:0));
 					}, false);
 					td.appendChild(ck);
 					var lb = document.createElement('label');
@@ -335,16 +334,15 @@ document.addEventListener("DOMContentLoaded", function(){
 					var idh = NR.getIDh(""+commids[j]);
 					tp.id = "chip_" + id;
 					im.src = "http://icon.nimg.jp/community/"+idh+"/"+id+".jpg";
-					im.alt = id;
+					im.alt = commids[j];
 					im.addEventListener('mouseover', function(){
-						var name  = NR.getName(this.alt);
-						if(!name) name = "取得中...";
-						var tp = document.getElementById("chip_" + this.alt);
+						var name  = NR.getName("comm",this.alt);
+						var tp = document.getElementById("chip_co" + this.alt);
 						tp.innerHTML = this.alt + "<br>" + name;
 						tp.style.visibility = "visible";
 					}, false);
 					im.addEventListener('mouseout', function(){
-						var tp = document.getElementById("chip_" + this.alt);
+						var tp = document.getElementById("chip_co" + this.alt);
 						tp.style.visibility = "hidden";
 					}, false);
 					var a = document.createElement('a');
@@ -361,14 +359,14 @@ document.addEventListener("DOMContentLoaded", function(){
 						td.setAttribute("class", "commlist_check");
 						var ck = document.createElement('input');
 						ck.type = 'checkbox';
-						ck.name = "co"+commids[j];
+						ck.name = commids[j];
 						ck.class = NR.types[i];
 						ck.id = NR.types[i] + "_co" + commids[j];
-						ck.checked = NR.getNotifiable(NR.types[i],"comm_"+commids[j])==1;
+						ck.checked = NR.getNotifiable(NR.types[i],"comm",commids[j])==1;
 						ck.addEventListener('change', function(){
 							var k = this.checked;
 							//console.log(this.class +"-"+this.name);
-							NR.setNotifiable(this.class,this.name,(k?1:0));
+							NR.setNotifiable(this.class,"comm",this.name,(k?1:0));
 						}, false);
 						td.appendChild(ck);
 						var lb = document.createElement('label');
