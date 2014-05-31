@@ -217,19 +217,19 @@ CNicoRepo.prototype.showPopup = function(data) {
 	}
 	// タイプ
 	type = this.getTitle(type);
-	// 時刻の整形
-	var stime = new Date(time/10);
-	stime = stime.getDate() + "日" + stime.getHours() + ":" + stime.getMinutes();
 	// ポップアップのセットアップ
-	if(!webkitNotifications) return;
-	var data = { nico: icon, nmsg: msg, name: author, title: type, time:stime };
-	var notice = webkitNotifications.createNotification(icon, type + stime, "【"+author+"】" + msg );
-	notice.onclick = function(x) {
-		this.cancel();
-		chrome.tabs.create({ url: lurl, selected: true });
+	if(Notification) {
+		// 時刻の整形
+		var stime = new Date(time/10);
+		stime = stime.getDate() + "日" + stime.getHours() + ":" + stime.getMinutes();
+		var data = { body:"【"+author+"】" + msg , icon:icon };
+		var notice = new Notification(type + stime, data);
+		notice.onclick = function(x) {
+			chrome.tabs.create({ url: lurl, selected: true });
+			this.close();
+		}
+		setTimeout( function(){ notice.close(); }, parseInt(this.settings.popuptime) );
 	}
-	notice.show();
-	setTimeout( function(){ notice.cancel(); }, parseInt(this.settings.popuptime) );
 	// 棒読みちゃん
 	if(this.settings.voice_use==1) bouyomi_talk( author + "。" + message );
 };
