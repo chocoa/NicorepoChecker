@@ -97,8 +97,19 @@ document.addEventListener("DOMContentLoaded", function(){
 		return count;
 	}
 
-
-
+	window.addEventListener('scroll', fixTableTitle, false);
+	function fixTableTitle() {
+		
+		var winY = window.scrollY;
+		var table = $("#user_list");
+		var tablec = $("#user_list_caption");
+		var tableh = $("#user_list_head");
+		var tableY = table.offset();
+		if(winY > tableY) {
+			
+		}
+		
+	}
 
 	// レポート設定リストの作成
 	getWatchList( function(ret){
@@ -110,133 +121,143 @@ document.addEventListener("DOMContentLoaded", function(){
 		userids = userids.unique();
 		// テーブル生成
 		var ta = document.createElement("table");
+			ta.id = "user_list";
 			// レポートリストヘッダー
-			var tr = document.createElement('tr');
-				var th = document.createElement('th');
-				th.innerText = "/";
-				th.setAttribute("class", "userlist_userheader");
-				tr.appendChild(th);
-				for(i=0;i<NR.types.length;i+=3) {
-					if(NR.types[i+2]!=1)continue;
-					th = document.createElement('th');
-					th.innerHTML = "<div class='rot_container'><div class='rot90'>"+NR.types[i+1]+"<br/><span>"+NR.types[i]+"</span></div></div>";//;
-					th.setAttribute("class", "userlist_header");
-					tr.appendChild(th);
-				}
-			ta.appendChild(tr);
-			// すべて設定
-			var tr = document.createElement('tr');
-				var th = document.createElement('th');
-				th.innerText = "すべて";
-				tr.appendChild(th);
-				for(i=0;i<NR.types.length;i+=3) {
-					if(NR.types[i+2]!=1)continue;
-					td = document.createElement('td');
-					td.setAttribute("class", "userlist_check");
-					var ck = document.createElement('input');
-					ck.type = 'checkbox';
-					ck.name = 'all';
-					ck.class = NR.types[i];
-					ck.id = NR.types[i] + "_all";
-					ck.checked = NR.getNotifiable(NR.types[i],"user","all")==1;
-					ck.addEventListener('change', function(){
-						var k = this.checked?1:0;
-						//console.log(this.class +"-"+this.name);
-						NR.setNotifiable(this.class,"user","all",k);
-						// ユーザー一挙設定
-						for(j=0;j<userids.length;j++) {
-							NR.setNotifiable(this.class,"user",userids[j],k);
-							var cbbid = document.getElementById(this.class + "_" + userids[j]);
-							cbbid.checked = k;
-						}
-					}, false);
-					td.appendChild(ck);
-					var lb = document.createElement('label');
-					lb.setAttribute("for", NR.types[i]+"_all");
-					td.appendChild(lb);
-					tr.appendChild(td);
-				}
-			ta.appendChild(tr);
-			// 新規設定
-			var tr = document.createElement('tr');
-				var th = document.createElement('th');
-				th.innerText = "新規";
-				tr.appendChild(th);
-				for(i=0;i<NR.types.length;i+=3) {
-					if(NR.types[i+2]!=1)continue;
-					td = document.createElement('td');
-					td.setAttribute("class", "userlist_check");
-					var ck = document.createElement('input');
-					ck.type = 'checkbox';
-					ck.name = 'new';
-					ck.class = NR.types[i];
-					ck.id = NR.types[i] + "_new";
-					ck.checked = NR.getNotifiable(NR.types[i],"user","new")==1;
-					ck.addEventListener('change', function(){
-						var k = this.checked;
-						//console.log(this.class +"-"+this.name);
-						NR.setNotifiable(this.class,"user","new",(k?1:0));
-					}, false);
-					td.appendChild(ck);
-					var lb = document.createElement('label');
-					lb.setAttribute("for", NR.types[i]+"_new");
-					td.appendChild(lb);
-					tr.appendChild(td);
-				}
-			ta.appendChild(tr);
-			// ユーザー設定
-			for(j=0;j<userids.length;j++) {
+			var caption = document.createElement('caption');
+			caption.innerText = "ユーザーリスト";
+			caption.id = "user_list_caption";
+			ta.appendChild(caption);
+			var thead = document.createElement('thead');
+				thead.id = "user_list_head";
 				var tr = document.createElement('tr');
 					var th = document.createElement('th');
-					var im = document.createElement("img");
-					var tp = document.createElement("span");
-					var id = ""+userids[j];
-					var idh = NR.getIDh(id);
-					tp.id = "chip_" + id;
-					im.src = "http://usericon.nimg.jp/usericon/"+idh+"/"+id+".jpg";
-					im.alt = id;
-					im.addEventListener('mouseover', function(){
-						var name  = NR.getName("user",this.alt);
-						var tp = document.getElementById("chip_" + this.alt);
-						tp.innerHTML = this.alt + "<br>" + name;
-						tp.style.visibility = "visible";
-					}, false);
-					im.addEventListener('mouseout', function(){
-						var tp = document.getElementById("chip_" + this.alt);
-						tp.style.visibility = "hidden";
-					}, false);
-					var a = document.createElement('a');
-					a.href = "http://www.nicovideo.jp/user/" + userids[j];
-					a.target = "_blank";
-					a.setAttribute("class", "tooltip");
-					a.appendChild(im)
-					a.appendChild(tp);
-					th.appendChild(a);
+					th.innerText = "/";
+					th.setAttribute("class", "userlist_userheader");
+					tr.appendChild(th);
+					for(i=0;i<NR.types.length;i+=3) {
+						if(NR.types[i+2]!=1)continue;
+						th = document.createElement('th');
+						th.innerHTML = "<div class='rot_container'><div class='rot90'>"+NR.types[i+1]+"<br/><span>"+NR.types[i]+"</span></div></div>";//;
+						th.setAttribute("class", "userlist_header");
+						tr.appendChild(th);
+					}
+				thead.appendChild(tr);
+			ta.appendChild(thead);
+			// すべて設定
+			var tbody = document.createElement('tbody');
+				var tr = document.createElement('tr');
+					var th = document.createElement('th');
+					th.innerText = "すべて";
 					tr.appendChild(th);
 					for(i=0;i<NR.types.length;i+=3) {
 						if(NR.types[i+2]!=1)continue;
 						td = document.createElement('td');
 						td.setAttribute("class", "userlist_check");
-						
 						var ck = document.createElement('input');
 						ck.type = 'checkbox';
-						ck.name = userids[j];
+						ck.name = 'all';
 						ck.class = NR.types[i];
-						ck.id = NR.types[i] + "_" + userids[j];
-						ck.checked = NR.getNotifiable(NR.types[i],"user",userids[j])==1;
+						ck.id = NR.types[i] + "_all";
+						ck.checked = NR.getNotifiable(NR.types[i],"user","all")==1;
 						ck.addEventListener('change', function(){
-							var k = this.checked;
+							var k = this.checked?1:0;
 							//console.log(this.class +"-"+this.name);
-							NR.setNotifiable(this.class,"user",this.name,(k?1:0));
+							NR.setNotifiable(this.class,"user","all",k);
+							// ユーザー一挙設定
+							for(j=0;j<userids.length;j++) {
+								NR.setNotifiable(this.class,"user",userids[j],k);
+								var cbbid = document.getElementById(this.class + "_" + userids[j]);
+								cbbid.checked = k;
+							}
 						}, false);
 						td.appendChild(ck);
 						var lb = document.createElement('label');
-						lb.setAttribute("for", NR.types[i] + "_" + userids[j]);
+						lb.setAttribute("for", NR.types[i]+"_all");
 						td.appendChild(lb);
 						tr.appendChild(td);
 					}
-				ta.appendChild(tr);
-			}
+				tbody.appendChild(tr);
+				// 新規設定
+				var tr = document.createElement('tr');
+					var th = document.createElement('th');
+					th.innerText = "新規";
+					tr.appendChild(th);
+					for(i=0;i<NR.types.length;i+=3) {
+						if(NR.types[i+2]!=1)continue;
+						td = document.createElement('td');
+						td.setAttribute("class", "userlist_check");
+						var ck = document.createElement('input');
+						ck.type = 'checkbox';
+						ck.name = 'new';
+						ck.class = NR.types[i];
+						ck.id = NR.types[i] + "_new";
+						ck.checked = NR.getNotifiable(NR.types[i],"user","new")==1;
+						ck.addEventListener('change', function(){
+							var k = this.checked;
+							//console.log(this.class +"-"+this.name);
+							NR.setNotifiable(this.class,"user","new",(k?1:0));
+						}, false);
+						td.appendChild(ck);
+						var lb = document.createElement('label');
+						lb.setAttribute("for", NR.types[i]+"_new");
+						td.appendChild(lb);
+						tr.appendChild(td);
+					}
+				tbody.appendChild(tr);
+				// ユーザー設定
+				for(j=0;j<userids.length;j++) {
+					var tr = document.createElement('tr');
+						var th = document.createElement('th');
+						var im = document.createElement("img");
+						var tp = document.createElement("span");
+						var id = ""+userids[j];
+						var idh = NR.getIDh(id);
+						tp.id = "chip_" + id;
+						im.src = "http://usericon.nimg.jp/usericon/"+idh+"/"+id+".jpg";
+						im.alt = id;
+						im.addEventListener('mouseover', function(){
+							var name  = NR.getName("user",this.alt);
+							var tp = document.getElementById("chip_" + this.alt);
+							tp.innerHTML = this.alt + "<br>" + name;
+							tp.style.visibility = "visible";
+						}, false);
+						im.addEventListener('mouseout', function(){
+							var tp = document.getElementById("chip_" + this.alt);
+							tp.style.visibility = "hidden";
+						}, false);
+						var a = document.createElement('a');
+						a.href = "http://www.nicovideo.jp/user/" + userids[j];
+						a.target = "_blank";
+						a.setAttribute("class", "tooltip");
+						a.appendChild(im)
+						a.appendChild(tp);
+						th.appendChild(a);
+						tr.appendChild(th);
+						for(i=0;i<NR.types.length;i+=3) {
+							if(NR.types[i+2]!=1)continue;
+							td = document.createElement('td');
+							td.setAttribute("class", "userlist_check");
+							
+							var ck = document.createElement('input');
+							ck.type = 'checkbox';
+							ck.name = userids[j];
+							ck.class = NR.types[i];
+							ck.id = NR.types[i] + "_" + userids[j];
+							ck.checked = NR.getNotifiable(NR.types[i],"user",userids[j])==1;
+							ck.addEventListener('change', function(){
+								var k = this.checked;
+								//console.log(this.class +"-"+this.name);
+								NR.setNotifiable(this.class,"user",this.name,(k?1:0));
+							}, false);
+							td.appendChild(ck);
+							var lb = document.createElement('label');
+							lb.setAttribute("for", NR.types[i] + "_" + userids[j]);
+							td.appendChild(lb);
+							tr.appendChild(td);
+						}
+					tbody.appendChild(tr);
+				}
+			ta.appendChild(tbody);
 		userlist.appendChild(ta);
 
 
@@ -248,110 +269,33 @@ document.addEventListener("DOMContentLoaded", function(){
 		commids = commids.unique();
 		// テーブル生成
 		var ta = document.createElement("table");
+			ta.id = "community_list";
 			// レポートリストヘッダー
-			var tr = document.createElement('tr');
-				var th = document.createElement('th');
-				th.innerText = "/";
-				th.setAttribute("class", "commlist_commheader");
-				tr.appendChild(th);
-				for(i=0;i<NR.types.length;i+=3) {
-					if(NR.types[i+2]!=3)continue;
-					th = document.createElement('th');
-					th.innerHTML = "<div class='rot_container'><div class='rot90'>"+NR.types[i+1]+"<br/><span>"+NR.types[i]+"</span></div></div>";//;
-					th.setAttribute("class", "commlist_header");
-					tr.appendChild(th);
-				}
-			ta.appendChild(tr);
-			// すべて設定
-			var tr = document.createElement('tr');
-				var th = document.createElement('th');
-				th.innerText = "すべて";
-				tr.appendChild(th);
-				for(i=0;i<NR.types.length;i+=3) {
-					if(NR.types[i+2]!=3)continue;
-					td = document.createElement('td');
-					td.setAttribute("class", "commlist_check");
-					var ck = document.createElement('input');
-					ck.type = 'checkbox';
-					ck.name = 'all';
-					ck.class = NR.types[i];
-					ck.id = NR.types[i] + "_all";
-					ck.checked = NR.getNotifiable(NR.types[i],"comm","all")==1;
-					ck.addEventListener('change', function(){
-						var k = this.checked?1:0;
-						//console.log(this.class +"-"+this.name);
-						NR.setNotifiable(this.class,"comm","all",k);
-						
-						// コミュニティー一挙設定
-						for(j=0;j<commids.length;j++) {
-							NR.setNotifiable(this.class,"comm",commids[j],k);
-							var cbbid = document.getElementById(this.class + "_co" + commids[j]);
-							cbbid.checked = k;
-						}
-						
-					}, false);
-					td.appendChild(ck);
-					var lb = document.createElement('label');
-					lb.setAttribute("for", NR.types[i]+"_all");
-					td.appendChild(lb);
-					tr.appendChild(td);
-				}
-			ta.appendChild(tr);
-			// 新規設定
-			var tr = document.createElement('tr');
-				var th = document.createElement('th');
-				th.innerText = "新規";
-				tr.appendChild(th);
-				for(i=0;i<NR.types.length;i+=3) {
-					if(NR.types[i+2]!=3)continue;
-					td = document.createElement('td');
-					td.setAttribute("class", "commlist_check");
-					var ck = document.createElement('input');
-					ck.type = 'checkbox';
-					ck.name = 'new';
-					ck.class = NR.types[i];
-					ck.id = NR.types[i] + "_new";
-					ck.checked = NR.getNotifiable(NR.types[i],"comm","new")==1;
-					ck.addEventListener('change', function(){
-						var k = this.checked;
-						//console.log(this.class +"-"+this.name);
-						NR.setNotifiable(this.class,"comm","new",(k?1:0));
-					}, false);
-					td.appendChild(ck);
-					var lb = document.createElement('label');
-					lb.setAttribute("for", NR.types[i]+"_new");
-					td.appendChild(lb);
-					tr.appendChild(td);
-				}
-			ta.appendChild(tr);
-			// コミュニティー設定
-			for(j=0;j<commids.length;j++) {
+			var caption = document.createElement('caption');
+			caption.innerText = "コミュニティーリスト";
+			caption.id = "community_list_caption";
+			ta.appendChild(caption);
+			var thead = document.createElement('thead');
+				thead.id = "community_list_head";
 				var tr = document.createElement('tr');
 					var th = document.createElement('th');
-					var im = document.createElement("img");
-					var tp = document.createElement("span");
-					var id = "co"+commids[j];
-					var idh = NR.getIDh(""+commids[j]);
-					tp.id = "chip_" + id;
-					im.src = "http://icon.nimg.jp/community/"+idh+"/"+id+".jpg";
-					im.alt = commids[j];
-					im.addEventListener('mouseover', function(){
-						var name  = NR.getName("comm",this.alt);
-						var tp = document.getElementById("chip_co" + this.alt);
-						tp.innerHTML = this.alt + "<br>" + name;
-						tp.style.visibility = "visible";
-					}, false);
-					im.addEventListener('mouseout', function(){
-						var tp = document.getElementById("chip_co" + this.alt);
-						tp.style.visibility = "hidden";
-					}, false);
-					var a = document.createElement('a');
-					a.href = "http://com.nicovideo.jp/community/co" + commids[j];
-					a.target = "_blank";
-					a.setAttribute("class", "tooltip");
-					a.appendChild(im);
-					a.appendChild(tp);
-					th.appendChild(a);
+					th.innerText = "/";
+					th.setAttribute("class", "commlist_commheader");
+					tr.appendChild(th);
+					for(i=0;i<NR.types.length;i+=3) {
+						if(NR.types[i+2]!=3)continue;
+						th = document.createElement('th');
+						th.innerHTML = "<div class='rot_container'><div class='rot90'>"+NR.types[i+1]+"<br/><span>"+NR.types[i]+"</span></div></div>";//;
+						th.setAttribute("class", "commlist_header");
+						tr.appendChild(th);
+					}
+				thead.appendChild(tr);
+			ta.appendChild(thead);
+			// すべて設定
+			var tbody = document.createElement('tbody');
+				var tr = document.createElement('tr');
+					var th = document.createElement('th');
+					th.innerText = "すべて";
 					tr.appendChild(th);
 					for(i=0;i<NR.types.length;i+=3) {
 						if(NR.types[i+2]!=3)continue;
@@ -359,23 +303,110 @@ document.addEventListener("DOMContentLoaded", function(){
 						td.setAttribute("class", "commlist_check");
 						var ck = document.createElement('input');
 						ck.type = 'checkbox';
-						ck.name = commids[j];
+						ck.name = 'all';
 						ck.class = NR.types[i];
-						ck.id = NR.types[i] + "_co" + commids[j];
-						ck.checked = NR.getNotifiable(NR.types[i],"comm",commids[j])==1;
+						ck.id = NR.types[i] + "_all";
+						ck.checked = NR.getNotifiable(NR.types[i],"comm","all")==1;
 						ck.addEventListener('change', function(){
-							var k = this.checked;
+							var k = this.checked?1:0;
 							//console.log(this.class +"-"+this.name);
-							NR.setNotifiable(this.class,"comm",this.name,(k?1:0));
+							NR.setNotifiable(this.class,"comm","all",k);
+							
+							// コミュニティー一挙設定
+							for(j=0;j<commids.length;j++) {
+								NR.setNotifiable(this.class,"comm",commids[j],k);
+								var cbbid = document.getElementById(this.class + "_co" + commids[j]);
+								cbbid.checked = k;
+							}
+							
 						}, false);
 						td.appendChild(ck);
 						var lb = document.createElement('label');
-						lb.setAttribute("for", NR.types[i] + "_co" + commids[j]);
+						lb.setAttribute("for", NR.types[i]+"_all");
 						td.appendChild(lb);
 						tr.appendChild(td);
 					}
-				ta.appendChild(tr);
-			}
+				tbody.appendChild(tr);
+				// 新規設定
+				var tr = document.createElement('tr');
+					var th = document.createElement('th');
+					th.innerText = "新規";
+					tr.appendChild(th);
+					for(i=0;i<NR.types.length;i+=3) {
+						if(NR.types[i+2]!=3)continue;
+						td = document.createElement('td');
+						td.setAttribute("class", "commlist_check");
+						var ck = document.createElement('input');
+						ck.type = 'checkbox';
+						ck.name = 'new';
+						ck.class = NR.types[i];
+						ck.id = NR.types[i] + "_new";
+						ck.checked = NR.getNotifiable(NR.types[i],"comm","new")==1;
+						ck.addEventListener('change', function(){
+							var k = this.checked;
+							//console.log(this.class +"-"+this.name);
+							NR.setNotifiable(this.class,"comm","new",(k?1:0));
+						}, false);
+						td.appendChild(ck);
+						var lb = document.createElement('label');
+						lb.setAttribute("for", NR.types[i]+"_new");
+						td.appendChild(lb);
+						tr.appendChild(td);
+					}
+				tbody.appendChild(tr);
+				// コミュニティー設定
+				for(j=0;j<commids.length;j++) {
+					var tr = document.createElement('tr');
+						var th = document.createElement('th');
+						var im = document.createElement("img");
+						var tp = document.createElement("span");
+						var id = "co"+commids[j];
+						var idh = NR.getIDh(""+commids[j]);
+						tp.id = "chip_" + id;
+						im.src = "http://icon.nimg.jp/community/"+idh+"/"+id+".jpg";
+						im.alt = commids[j];
+						im.addEventListener('mouseover', function(){
+							var name  = NR.getName("comm",this.alt);
+							var tp = document.getElementById("chip_co" + this.alt);
+							tp.innerHTML = this.alt + "<br>" + name;
+							tp.style.visibility = "visible";
+						}, false);
+						im.addEventListener('mouseout', function(){
+							var tp = document.getElementById("chip_co" + this.alt);
+							tp.style.visibility = "hidden";
+						}, false);
+						var a = document.createElement('a');
+						a.href = "http://com.nicovideo.jp/community/co" + commids[j];
+						a.target = "_blank";
+						a.setAttribute("class", "tooltip");
+						a.appendChild(im);
+						a.appendChild(tp);
+						th.appendChild(a);
+						tr.appendChild(th);
+						for(i=0;i<NR.types.length;i+=3) {
+							if(NR.types[i+2]!=3)continue;
+							td = document.createElement('td');
+							td.setAttribute("class", "commlist_check");
+							var ck = document.createElement('input');
+							ck.type = 'checkbox';
+							ck.name = commids[j];
+							ck.class = NR.types[i];
+							ck.id = NR.types[i] + "_co" + commids[j];
+							ck.checked = NR.getNotifiable(NR.types[i],"comm",commids[j])==1;
+							ck.addEventListener('change', function(){
+								var k = this.checked;
+								//console.log(this.class +"-"+this.name);
+								NR.setNotifiable(this.class,"comm",this.name,(k?1:0));
+							}, false);
+							td.appendChild(ck);
+							var lb = document.createElement('label');
+							lb.setAttribute("for", NR.types[i] + "_co" + commids[j]);
+							td.appendChild(lb);
+							tr.appendChild(td);
+						}
+					tbody.appendChild(tr);
+				}
+			ta.appendChild(tbody);
 		commlist.appendChild(ta);
 	});
 

@@ -1,0 +1,174 @@
+body {
+	background:url("./img/back.gif");
+}
+
+/* チェックリスト */
+#userlist {
+	float:left;
+	padding-right:10px;
+}
+#commlist {
+	float:left;
+}
+.iconlist img {
+	width:50px;
+	height:50px;
+}
+/* タイトル回転 */
+.rot_container {
+	width:26px;
+	height:200px;
+	margin:2px 0px;
+	overflow:hidden;
+}
+.rot90{
+	font-size:15px;
+	line-height:11px;
+	-webkit-transform-origin:0 0;
+	-webkit-transform:translate(0px,200px) rotate(-90deg); 
+	width:200px;
+	text-align:left;
+}
+.rot90 span{
+	font-size : 8px;
+	font-weight:normal;
+}
+
+
+/* ユーザーチェックボックス */
+.userlist_check {
+	width:28px;
+	height:50px;
+}
+.userlist_check input {
+	display:none;
+}
+.userlist_check label {
+	display: inline;
+}
+.userlist_check input + label {
+	background-color: #fafafa;
+	border: 1px solid #cacece;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05);
+	padding: 22px 13px;
+	border-radius: 3px;
+	display: inline-block;
+	position: relative;
+}
+.userlist_check input + label:active,
+.userlist_check input:checked + label:active {
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px 1px 3px rgba(0,0,0,0.1);
+}
+.userlist_check input:checked + label {
+	background-color: #e9fcee;
+	border: 1px solid #adb8c0;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05), inset 15px 10px -12px rgba(255,255,255,0.1);
+	color: #99a1a7;
+}
+.userlist_check input:checked + label:after {
+	content: '\2714';
+	font-size: 20px;
+	position: absolute;
+	top: 12px;
+	left: 3px;
+	color: #66aa66;
+}
+.userlist_check label:hover {
+	border: 1px solid #666;
+}
+
+
+/* コミュニティチェックボックス */
+.commlist_check {
+	width:28px;
+	height:50px;
+}
+.commlist_check input {
+	display:none;
+}
+.commlist_check label {
+	display: inline;
+}
+.commlist_check input + label {
+	background-color: #fafafa;
+	border: 1px solid #cacece;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05);
+	padding: 22px 13px;
+	border-radius: 3px;
+	display: inline-block;
+	position: relative;
+}
+.commlist_check input + label:active,
+.commlist_check input:checked + label:active {
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px 1px 3px rgba(0,0,0,0.1);
+}
+.commlist_check input:checked + label {
+	background-color: #e9fcee;
+	border: 1px solid #adb8c0;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05), inset 15px 10px -12px rgba(255,255,255,0.1);
+	color: #99a1a7;
+}
+.commlist_check input:checked + label:after {
+	content: '\2714';
+	font-size: 20px;
+	position: absolute;
+	top: 12px;
+	left: 3px;
+	color: #66aa66;
+}
+.commlist_check label:hover {
+	border: 1px solid #666;
+}
+
+
+
+/* テーブル全般 */
+table {
+	border:1px solid #FFABF0;
+	border-radius: 5px;
+
+}
+th {
+	background-color: #EEEEEE;
+	text-align: center;
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	box-shadow: 0px 0px 3px #EBF1ED;
+	-moz-box-shadow: 0px 0px 3px #EBF1ED;
+	-webkit-box-shadow: 0px 0px 3px #EBF1ED;
+}
+td {
+	background-color: #FFFFFF;
+	text-align: center;
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	box-shadow: 0px 0px 3px #EBF1ED;
+	-moz-box-shadow: 0px 0px 3px #EBF1ED;
+	-webkit-box-shadow: 0px 0px 3px #EBF1ED;
+}
+
+/* 名前表示用ツールチップ */
+a.tooltip {
+	position:relative;
+	z-index: 1;
+}
+a.tooltip span {
+	white-space:nowrap;
+	position:absolute;
+	visibility:hidden;
+	padding:2px 3px;
+	margin-left:8px;
+	background:#eee;
+	border:1px solid #aaa;
+	text-align:left;
+	color:#555;
+	
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	box-shadow: 0px 0px 3px #EBF1ED;
+	-moz-box-shadow: 0px 0px 3px #EBF1ED;
+	-webkit-box-shadow: 0px 0px 3px #EBF1ED;
+}
