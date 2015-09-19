@@ -66,6 +66,7 @@ function CNicoRepo() {
 		"user_watchlist_registered", "マイリスト入り", 1,
 		"user_register_chblog", "ブロマガ投稿", 1,
 		"user_mylist_add_blomaga", "ブロマガマイリスト登録", 1,
+		"user_solid_distribute", "ニコニ立体の配布データ公開", 1,
 		"community_action_info", "お知らせ追加", 3,
 		"community_action_level", "コミュレベル更新", 3,
 		"community_video_upload", "動画追加", 3,

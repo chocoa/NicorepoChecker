@@ -6,7 +6,7 @@
       "128": "icon128.png",
       "48": "icon48.png"
    },
-   "version": "0.2.1",
+   "version": "0.3.0",
    "permissions": [ "http://flapi.nicovideo.jp/", "http://www.nicovideo.jp/", "http://com.nicovideo.jp/", "notifications" ],
    "background": { "page": "background.html" },
    "options_page": "options.html"
